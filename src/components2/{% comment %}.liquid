@@ -1,0 +1,168 @@
+{% comment %}
+Script to see if first section to hide header border
+{% endcomment %}
+
+{% if section.settings.feature_image %}
+  {% assign feature_image = section.settings.feature_image %}
+{% endif %}
+{% assign cta_text = section.settings.feature_image_cta_text | escape %}
+{% assign cta_url = section.settings.feature_image_cta_url %}
+{% assign feature_copy =  section.settings.feature_image_copy | escape %}
+{% assign feature_text =  section.settings.feature_image_text  %}
+{% capture section_class %}section-{{ section.id }}{% endcapture %}
+
+{% assign style = section.settings.image_style %}
+
+<section class="feature-image {{ feature_image }} {{ section_class }} relative feature-image--{% if style == 'full_screen' %}full_screen{% else %}content{% endif %} clearfix">
+
+    {% if style == 'fit_content' and section.settings.feature_image %}
+      {% capture img_id %}FeatureImage-{{ feature_image.id }}{% endcapture %}
+      {% capture wrapper_id %}FeatureImageWrapper-{{ feature_image.id }}{% endcapture %}
+      {%- assign img_url = feature_image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+  
+      <div id="{{ wrapper_id }}" class="resp-img-wrapper js">
+        <div style="padding-top:{{ 1 | divided_by: feature_image.aspect_ratio | times: 100}}%;">
+          1
+          <img id="{{ img_id }}"
+               class="resp-img feature-image__img-content lazyload"
+               src="{{ feature_image | img_url: '300x' }}"
+               data-src="{{ img_url }}"
+               data-widths="[540, 720, 900, 1080, 1296, 1512, 1728, 1944, 2048, 4472]"
+               data-aspectratio="{{ feature_image.aspect_ratio }}"
+               data-sizes="auto"
+               alt="{{ feature_image.alt | escape }}">
+        </div>
+        <div style="padding-top:{{ 1 | divided_by: feature_image.aspect_ratio | times: 100}}%;">
+          2
+          <img id="{{ img_id }}"
+               class="feature-image__mobile-img"
+               src="{{ feature_image_mobile | img_url: '300x' }}"
+               data-src="{{ img_url }}"
+               data-widths="[540, 720, 900, 1080, 1296, 1512, 1728, 1944, 2048, 4472]"
+               data-aspectratio="{{ feature_image.aspect_ratio }}"
+               data-sizes="auto"
+               alt="{{ feature_image.alt | escape }}">
+          {% if section.settings.feature_image != blank and section.settings.feature_image_mobile != blank %}
+
+            3<img src="{{ section.settings.feature_image | img_url: "master" }}">
+            4<img src="{{ section.settings.feature_image | img_url: "master" }}">
+
+		{% endif %}
+        </div>
+      </div>
+      <noscript>
+        5<img src="{{ feature_image.src | img_url: 'large' }}" alt="{{ feature_image.alt | escape }}" class="feature-image__img-content">
+      </noscript>
+    {% endif %}
+
+   <div class="feature-image-inner lazyload"
+        {%- if style == 'full_screen' and section.settings.feature_image -%}
+        data-bgset="{% include 'bgset', image: feature_image %}"
+        data-sizes="auto"
+        data-parent-fit="cover"
+        style="background-image: url('{{ feature_image | img_url: '300x300' }});"
+        {%- endif -%}>
+
+    {% if cta_url != blank or feature_copy != '' %}
+    <div class="content-wrapper {% if width == 'full_width' %}wrapper{% endif %}">
+      <div class="grid--full grid--table">
+        <div class="grid__item">
+      
+
+        
+          {% if feature_copy != '' %}
+        <div class="feature_copy-holder  {% if cta_url != '' %}with-cta{% endif %}">
+        <h5 class="feature-image-overlay {% unless section.settings.feature_image_border %}no-border{% endunless %}">{{ feature_copy }}</h5>
+          
+          {% if feature_text != '' %}
+          <div class="feature-image-text feature-copy">
+            {{ feature_text }}
+          </div>
+          {% endif %}
+  
+        </div>
+        {% endif %}
+        
+
+        {% if cta_url != blank %}
+        <a href="{{ cta_url }}" class="feature-image-cta btn">{{ cta_text }}  <span class="next-arrow">{% include 'icon-forward' %}</span></a>
+        {% endif %}
+
+        </div>
+      </div>
+
+    </div>
+    {% endif %}
+  </div>
+
+
+  {% unless section.settings.feature_image %}
+  <div class="feature-image__placeholder {% if style == 'fit_content' %}feature-image__placeholder--fit{% endif %}">{{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}</div>
+  {% endunless %}
+
+</section>
+
+{% schema %}
+{
+  "name": "Image with text overlay",
+  "settings": [
+    {
+      "type": "select",
+      "id": "image_style",
+      "label": "Image style:",
+      "options": [
+        {
+          "value": "full_screen",
+          "label": "Full Screen"
+        },
+        {
+          "value": "fit_content",
+          "label": "Content"
+        }
+      ],
+      "info": "Use \'Content\' style if you want to avoid image cropping."
+    },
+    {
+      "type": "image_picker",
+      "id": "feature_image",
+      "label": "Image"
+    },
+ {
+      "type": "image_picker",
+      "id": "feature_image_mobile",
+      "label": "Image for mobile"
+    },
+    {
+      "type": "text",
+      "id": "feature_image_copy",
+      "label": "Heading",
+      "default": "Image with text overlay"
+    },
+    
+    {
+      "type": "richtext",
+      "id": "feature_image_text",
+      "label": "Text"
+    },
+    {
+      "type": "url",
+      "id": "feature_image_cta_url",
+      "label": "Optional: Call to action URL"
+    },
+    {
+      "type": "text",
+      "id": "feature_image_cta_text",
+      "label": "Call to action button text",
+      "default": "Shop Now"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Image with text overlay",
+      "category": "Image"
+    }
+  ]
+}
+{% endschema %}
+
+
